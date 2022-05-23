@@ -101,7 +101,7 @@ const App = () => {
         <Text>{item.nome} </Text>
         <Text>({item.quantidade})</Text>
         <Pressable style={styles.botaoIcone} onPress={() => deleteItem(item.id)}>
-          <FontAwesome name='trash' color={'#000'}/>
+          <FontAwesome name='trash' size={15} color={'#eee'}/>
         </Pressable>
       </View>
     );
@@ -133,7 +133,7 @@ const App = () => {
 
       <Pressable style={styles.botao} title='Adicionar' onPress={incluirItem}>
         <Text style={styles.textoBotao}>
-          <FontAwesome name='plus-circle' color={'#eee'} size={25} style={styles.iconeBotao}/>
+          <FontAwesome name='plus-circle' color={'#eee'} size={20} style={styles.iconeBotao}/>
           Adicionar na Lista
         </Text>
       </Pressable>
@@ -159,10 +159,11 @@ const styles = StyleSheet.create({
     fontSize: 28,
     textAlign: 'center',
     borderBottomWidth: 2,
-    borderBottomColor: '#000'
+    borderBottomColor: '#60a561',
+    color: '#60a561'
   },
   input:{
-    borderColor: '#000',
+    borderColor: '#f7b2bd',
     borderWidth: 2,
     paddingVertical: 15,
     paddingHorizontal: 15,
@@ -170,15 +171,15 @@ const styles = StyleSheet.create({
     borderRadius: 35
   },
   botao:{
-    padding: 20,
-    backgroundColor: '#333',
+    padding: 10,
+    backgroundColor: '#e34a6f',
     borderRadius: 35,
     marginHorizontal: 'auto'
   },
   textoBotao:{
     textAlign: 'center',
     color: '#fff',
-    fontSize: 20
+    fontSize: 18
   },
   iconeBotao:{
     marginRight: 5
@@ -192,15 +193,15 @@ const styles = StyleSheet.create({
     borderColor: "#ddd",
   },
   containerList:{
-    borderWidth: 1,
+    borderWidth: 2,
     marginVertical: 15,
-    borderRadius: 15
+    borderRadius: 15,
+    borderColor: '#053225'
   },
   botaoIcone:{
     marginLeft: 'auto',
     padding: 10,
-    backgroundColor: '#eee',
+    backgroundColor: '#ed474a',
     borderRadius: 35
   }
-
 });

@@ -1,6 +1,5 @@
-import { StatusBar } from 'expo-status-bar';
 import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, Button, FlatList, StyleSheet, Pressable } from 'react-native';
+import { View, Text, TextInput, FlatList, StyleSheet, Pressable } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import * as SQLite from 'expo-sqlite';
 
@@ -19,7 +18,7 @@ const App = () => {
           console.log("Tabela criada com sucesso!");
         },
         error => {
-          console.log("error on creating table " + error.message);
+          console.log("Erro ao criar a tabela " + error.message);
         },
       );
     });
@@ -94,7 +93,7 @@ const App = () => {
         <Text style={{ marginRight: 9 }}>{item.id}</Text>
         <Text>{item.nome} </Text>
         <Pressable style={styles.botaoIcone} onPress={() => deleteTarefa(item.id)}>
-          <FontAwesome name='trash' color={'#000'}/>
+          <FontAwesome name='trash' size={15} color={'#eee'}/>
         </Pressable>
       </View>
     );
@@ -119,7 +118,7 @@ const App = () => {
 
       <Pressable style={styles.botao} title='Adicionar' onPress={incluirTarefa}>
         <Text style={styles.textoBotao}>
-          <FontAwesome name='plus-circle' color={'#eee'} size={25} style={styles.iconeBotao}/>
+          <FontAwesome name='plus-circle' color={'#eee'} size={20} style={styles.iconeBotao}/>
           Adicionar Tarefa
         </Text>
       </Pressable>
@@ -145,10 +144,11 @@ const styles = StyleSheet.create({
     fontSize: 28,
     textAlign: 'center',
     borderBottomWidth: 2,
-    borderBottomColor: '#000'
+    borderBottomColor: '#ffba08',
+    color: '#ffba08'
   },
   input:{
-    borderColor: '#000',
+    borderColor: '#ffba08',
     borderWidth: 2,
     paddingVertical: 15,
     paddingHorizontal: 15,
@@ -156,15 +156,15 @@ const styles = StyleSheet.create({
     borderRadius: 35
   },
   botao:{
-    padding: 20,
-    backgroundColor: '#333',
+    padding: 10,
+    backgroundColor: '#1565c0',
     borderRadius: 35,
     marginHorizontal: 'auto'
   },
   textoBotao:{
     textAlign: 'center',
     color: '#fff',
-    fontSize: 20
+    fontSize: 18
   },
   iconeBotao:{
     marginRight: 5
@@ -178,14 +178,15 @@ const styles = StyleSheet.create({
     borderColor: "#ddd",
   },
   containerList:{
-    borderWidth: 1,
+    borderWidth: 2,
     marginVertical: 15,
-    borderRadius: 15
+    borderRadius: 15,
+    borderColor: '#1565c0'
   },
   botaoIcone:{
     marginLeft: 'auto',
     padding: 10,
-    backgroundColor: '#eee',
+    backgroundColor: '#d00000',
     borderRadius: 35
   }
 

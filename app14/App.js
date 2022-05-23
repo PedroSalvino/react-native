@@ -66,14 +66,15 @@ export default class App extends Component {
       <View style={styles.container}>
         <Text style={styles.titulo}>Frases</Text>
 
-
-        <Text>Dia</Text>
-        <Switch thumbColor='blue' value={this.state.tema}
-        onValueChange={(valorSwitch) => this.mudarTema(valorSwitch)}/>
-                
-        <Text>Pequeno</Text>
-        <Switch thumbColor='blue' value={this.state.texto}
-        onValueChange={(valorSwitch) => this.mudarTexto(valorSwitch)}/>
+        <View style={styles.row}>
+          <Text>Dia</Text>
+          <Switch thumbColor='blue' value={this.state.tema}
+          onValueChange={(valorSwitch) => this.mudarTema(valorSwitch)}/>
+                  
+          <Text>Pequeno</Text>
+          <Switch thumbColor='blue' value={this.state.texto}
+          onValueChange={(valorSwitch) => this.mudarTexto(valorSwitch)}/>
+        </View>
         
         <Text style={[styles.texto, this.state.textoGrande == 'true' || this.state.textoGrande == true ? styles.textoGrande : styles.textoPequeno, this.state.temaDark == 'true' || this.state.temaDark == true ? styles.temaEscuro : styles.temaClaro]}>
         “ 
@@ -98,11 +99,10 @@ const styles = StyleSheet.create({
   titulo:{
     fontSize: 28,
     textAlign: 'center',
-    padding: 25,
-    backgroundColor: '#a2d2ff',
+    padding: 2,
     color: '#1d3557',
     borderColor: '#1d3557',
-    borderWidth: 2,
+    borderBottomWidth: 2,
     borderStyle:'solid'
   },
   texto:{
@@ -124,6 +124,10 @@ const styles = StyleSheet.create({
   temaEscuro:{
     backgroundColor: '#1d3557',
     color: '#f1faee'
+  },
+  row:{
+    display: 'flex',
+    alignItems: 'center',
   }
   
 });
