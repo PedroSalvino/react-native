@@ -1,87 +1,101 @@
 import { StatusBar } from 'expo-status-bar';
-import React, {useEffect, useState} from 'react';
-import { Button, FlatList, StyleSheet, Text, TextInput, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, TextInput, Button, FlatList, StyleSheet, Pressable } from 'react-native';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import * as SQLite from 'expo-sqlite';
 
 const db = SQLite.openDatabase("tarefas.db");
 
 const App = () => {
-  
   const [tarefa, setTarefa] = useState("");
   const [tarefas, setTarefas] = useState([]);
 
   const createTables = () => {
     db.transaction(txn => {
       txn.executeSql(
-        `CREATE TABLE IF NOT EXISTS tarefas (id INTEGER PRIMARY KEY AUTOINCREMENT, nome VARCHAR(25))`,
+        `CREATE TABLE IF NOT EXISTS tarefas (id INTEGER PRIMARY KEY AUTOINCREMENT, nome VARCHAR(20))`,
         [],
         (sqlTxn, res) => {
           console.log("Tabela criada com sucesso!");
         },
         error => {
-          console.log("Erro ao criar a tabela "+ error.message);
+          console.log("error on creating table " + error.message);
         },
       );
     });
   };
 
   const incluirTarefa = () => {
-    if (!tarefa){
+    if (!tarefa) {
       alert("Informe uma tarefa");
       return false;
     }
-
     db.transaction(txn => {
-      txn.executeSql(`INSERT INTO tarefas (nome) VALUES (?)`),
-      [tarefa],
-      (sqlTxn, res) =>{
-        console.log(`${tarefa} Tarefa incluída com sucesso!`);
-        getTarefas();
-        setTarefa("");
-      },
-      error =>{
-        console.log("Erro ao inserir uma tarefa "+error.message);
-      }
+      txn.executeSql(
+        `INSERT INTO tarefas (nome) VALUES (?)`,
+        [tarefa],
+        (sqlTxn, res) => {
+          console.log(`${tarefa} Tarefa adicionada com sucesso!`);
+          getTarefas();
+          setTarefa("");
+        },
+        error => {
+          console.log("Erro ao inserir uma Tarefa " + error.message);
+        },
+      );
     });
-  };
+  }
 
   const getTarefas = () => {
     db.transaction(txn => {
       txn.executeSql(
-        `SELECT * FROM tarefas ORDER BY id DESC`,
+        `SELECT * FROM tarefas ORDER BY id`,
         [],
-        (sqlTxn,res) => {
+        (sqlTxn, res) => {
           console.log("Tarefas lidas com sucesso!");
           let len = res.rows.length;
 
-          if(len > 0){
+          if (len > 0) {
             let results = [];
-            for(let i = 0; i< len; i++){
+            for (let i = 0; i < len; i++) {
               let item = res.rows.item(i);
-              results.push({id: item.id, nome: item.nome});
+              results.push({ id: item.id, nome: item.nome });
             }
             setTarefas(results);
-            console.log(results);
           }
         },
         error => {
-          console.log("Erro ao obter Tarefas "+error.message);
-        },
+          console.log("Erro ao obter Tarefas " + error.message);
+        }
       );
     });
   };
 
+  const deleteTarefa = item => {
+    db.transaction(txn => {
+      txn.executeSql(
+        `DELETE FROM tarefas WHERE id = ?`,
+        [item],
+        (sqlTxn, res) => {
+          console.log(`${tarefa} Tarefa removida com sucesso!`);
+          setTarefas('');
+          getTarefas();
+        },
+        error => {
+          console.log("Erro ao deletar uma Tarefa " + error.message);
+        },
+      );
+    });
+  }
+
   const renderTarefa = ({ item }) => {
     return (
-      <View style={{
-        flexDirection: "row",
-        paddingVertical: 12,
-        paddingHorizontal: 10,
-        borderBottomWidth: 1,
-        borderColor: "#ddd",
-      }}>
+      <View style={styles.list}>
         <Text style={{ marginRight: 9 }}>{item.id}</Text>
-        <Text>{item.nome}</Text>
+        <Text>{item.nome} </Text>
+        <Pressable style={styles.botaoIcone} onPress={() => deleteTarefa(item.id)}>
+          <FontAwesome name='trash' color={'#000'}/>
+        </Pressable>
       </View>
     );
   };
@@ -93,21 +107,28 @@ const App = () => {
 
   return (
     <View style={styles.container}>
-      <StatusBar style="auto" />
       
+      <Text style={styles.titulo}>Tarefas</Text>
+
       <TextInput
         placeholder='Escreva uma tarefa'
         value={tarefa}
         onChangeText={setTarefa}
-        style={{marginHorizontal: 0}}
+        style={styles.input}
       />
 
-      <Button title='Adicionar' onPress={incluirTarefa}/>
-
+      <Pressable style={styles.botao} title='Adicionar' onPress={incluirTarefa}>
+        <Text style={styles.textoBotao}>
+          <FontAwesome name='plus-circle' color={'#eee'} size={25} style={styles.iconeBotao}/>
+          Adicionar Tarefa
+        </Text>
+      </Pressable>
+      
       <FlatList
         data={tarefas}
         renderItem={renderTarefa}
         key={t => t.id}
+        style={styles.containerList}
       />
     </View>
   );
@@ -118,8 +139,54 @@ export default App;
 const styles = StyleSheet.create({
   container: {
     backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
+    padding: 30
   },
-});
+  titulo:{
+    fontSize: 28,
+    textAlign: 'center',
+    borderBottomWidth: 2,
+    borderBottomColor: '#000'
+  },
+  input:{
+    borderColor: '#000',
+    borderWidth: 2,
+    paddingVertical: 15,
+    paddingHorizontal: 15,
+    marginVertical: 15,
+    borderRadius: 35
+  },
+  botao:{
+    padding: 20,
+    backgroundColor: '#333',
+    borderRadius: 35,
+    marginHorizontal: 'auto'
+  },
+  textoBotao:{
+    textAlign: 'center',
+    color: '#fff',
+    fontSize: 20
+  },
+  iconeBotao:{
+    marginRight: 5
+  },
+  list:{
+    flexDirection: "row",
+    paddingVertical: 12,
+    paddingHorizontal: 10,
+    margin: 10,
+    borderBottomWidth: 1,
+    borderColor: "#ddd",
+  },
+  containerList:{
+    borderWidth: 1,
+    marginVertical: 15,
+    borderRadius: 15
+  },
+  botaoIcone:{
+    marginLeft: 'auto',
+    padding: 10,
+    backgroundColor: '#eee',
+    borderRadius: 35
+  }
 
+});
