@@ -1,93 +1,87 @@
-import React, { Component } from 'react';
+import React, { Component, useState } from 'react';
 import { StyleSheet, Text, TextInput, View, Image, Pressable } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
-import api from './src/services/api';
+import axios from 'axios';
 
-class App extends Component {
-
-  constructor(props){
-    super(props);
-    this.state = {
-      user: '',
-      dados: '',
-      loading: true
-    }
-    this.pegaUser = this.pegaUser.bind(this);
-  }
-
-  async componentDidMount() {
-    if(this.state.user != ''){
-      try{
-        const user = this.state.user;
-        const response = await api.get('/'+user);
+export default function App() {
   
-        this.setState({
-          dados: response.data,
-          loading: false
-        });
-      }catch(e){
-        console.error(e);
+  const [userValue, setUserValue] = useState('');
+  const [data, setData] = useState(false);
+  
+  async function buscarUser() {
+    try{
+      const response = await axios.get(`https://api.github.com/users/${userValue}`);
+      
+      if(response){
+        setData(response.data);
       }
+      
+    }catch(e){
+      console.error(e);
+      setData(false);
     }
   }
 
-  pegaUser(valor){
-    this.setState({
-      user: valor
-    });
-  }
+  return(
+    <View style={styles.container}>
+      <Text style={styles.titulo}>Perfil dos Devs</Text>  
 
-  render(){
-    return(
-      <View style={styles.container}>
-        <Text style={styles.titulo}>Perfil dos Devs</Text>  
+      <View>
+      {
+      data.length !=0 && data ? (<Image
+        source={{ uri: data.avatar_url}}
+        style={styles.image}
+      />) : (<Text></Text>)
+      }
+      </View>
+      
+      <TextInput style={styles.input} placeholder='Digite o perfil do Github' value={userValue} onChangeText={value => setUserValue(value)}/>
 
-        <View>
-        <Image
-          source={{ uri: this.state.dados ? ''+this.state.dados : 'https://picsum.photos/id/0/300/300' }}
-          style={styles.image}
-        />
-        </View>
-        
-        <TextInput style={styles.input} placeholder='Digite o perfil do Github' onChangeText={this.pegaUser}/>
-
-        <Pressable >
-          <Text>
-            <FontAwesome size={20} name='search'/>
-            Buscar
-          </Text>
-        </Pressable>
-        
+      <Pressable onPress={buscarUser} style={styles.botao}>
+        <Text style={styles.textoBotao}>
+          <FontAwesome size={20} name='search' style={styles.iconeBotao}/>
+          Buscar
+        </Text>
+      </Pressable>
+      
+      {data ? (
         <View style={styles.containerList}>
           <Text style={styles.list}>
             <FontAwesome name='home' size={20} color={'#fb643f'}/>
-            {this.state.loading == false ? " Id: "+this.state.dados.id : " Id"}
+            {" Id: "+data.id}
           </Text>
           <Text style={styles.list}>
             <FontAwesome name='map-marker' size={20} color={'#fb643f'}/>
-            {this.state.loading == false ? " Nome: "+this.state.dados.name : " Nome"}
+            {" Nome: "+data.name}
           </Text>
           <Text style={styles.list}>
             <FontAwesome name='map-signs' size={20} color={'#fb643f'}/>
-            {this.state.loading == false ? " Repositórios: "+this.state.dados.public_repos : " Repositórios"}
+            {" Repositórios: "+data.public_repos}
           </Text>
           <Text style={styles.list}>
             <FontAwesome name='map' size={20} color={'#fb643f'}/>
-            {this.state.loading == false ? " Criado em: "+this.state.dados.created_at : " Criado em"}
+            {" Criado em: "+data.created_at}
           </Text>
           <Text style={styles.list}>
             <FontAwesome name='flag' size={20} color={'#fb643f'}/>
-            {this.state.loading == false ? " Seguidores: "+this.state.dados.followers : " Seguidores"}
+            {" Seguidores: "+data.followers}
           </Text>
           <Text style={styles.list}>
             <FontAwesome name='flag' size={20} color={'#fb643f'}/>
-            {this.state.loading == false ? " Seguindo: "+this.state.dados.following : " Seguindo"}
+            {" Seguindo: "+data.following}
           </Text>
         </View>
-      </View>
-    );
-  }
+
+      ) : (
+        <View>
+          <Text style={{textAlign: 'center', marginVertical: 15, fontSize: 20}}>Usuário não encontrado!</Text>
+        </View>
+      )}
+
+      
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
@@ -131,8 +125,24 @@ const styles = StyleSheet.create({
     borderRadius: 35
   },
   image:{
-    width: 30
+    width: 300,
+    height: 300,
+    marginHorizontal: 'auto',
+    marginVertical: 10,
+    borderColor: '#004b60',
+    borderWidth: 2
+  },
+  botao:{
+    paddingVertical: 10,
+    backgroundColor: '#e34a6f',
+    borderRadius: 35,
+  },
+  textoBotao:{
+    textAlign: 'center',
+    color: '#fff',
+    fontSize: 18
+  },
+  iconeBotao:{
+    marginRight: 5
   }
 });
-
-export default App;
