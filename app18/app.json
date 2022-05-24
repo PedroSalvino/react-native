@@ -1,0 +1,10 @@
+{
+  "expo": {
+    "name": "app18",
+    "slug": "app18",
+    "version": "1.0.0",
+    "assetBundlePatterns": [
+      "**/*"
+    ]
+  }
+}
