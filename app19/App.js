@@ -1,136 +1,143 @@
-import React, { Component } from 'react';
+import React, { useState } from 'react';
 import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import {Picker} from '@react-native-picker/picker';
+import axios from 'axios';
 
-export default class App extends Component {
+export default function App () {
+  
+  const [valor, setValor] = useState('');
+  const [de, setDe] = useState(0);
+  const [para, setPara] = useState(0);
+  const [resultado, setResultado] = useState('');
 
-  constructor(props){
-    super(props);
-    this.state = {
-      valor: 0,
-      de: 0,
-      para: 0,
-      moedas: [
-        {nome : 'Dólar'},
-        {nome : 'Euro'},
-        {nome : 'Real'},
-        {nome: 'Bitcoin'},
-      ],
-      resultado: 0,
-      cotacao: 0,
-    };
+  async function pegarCotacao(){
+    try{
+      
+      if(de != para && de != '' && para != ''){
 
-    this.pegarValor = this.pegarValor.bind(this);
-    this.converterMoedas = this.converterMoedas.bind(this);
-  };
+        if(para == 'BTC'){
 
-  pegarValor(valor){
-    this.setState({
-      valor: valor
-    });
+          setPara(de);
+          setDe('BTC');
+        }
+        
+        const response = await axios.get(`https://economia.awesomeapi.com.br/json/last/${de}-${para}`);
+        
+        if(response){
+          
+          let simbolo = '';
+          let resultado = 0;
+          
+          if(para == 'USD'){
+            simbolo = '$';
+          }
+          else if(para == 'EUR'){
+            simbolo = '€';
+          }
+          else if(para == 'BRL'){
+            simbolo = 'R$'
+          }
+          else if(para == 'BTC'){
+            simbolo = '₿'
+          }
+      
+          if(de == para){
+            resultado = valor;
+          }
+          else{
+            if(de == 'USD'){
+              if(para == 'EUR'){
+                resultado = valor * response.data.USDEUR.ask;
+              }
+              else if(para == 'BRL'){
+                resultado = valor * response.data.USDBRL.ask;
+              }
+              else{
+                resultado = valor * (1/response.data.BTCUSD.ask);
+              }
+            }
+      
+            if(de == 'EUR'){
+              if(para == 'USD'){
+                resultado = valor * response.data.EURUSD.ask;
+              }
+              else if(para == 'BRL'){
+                resultado = valor * response.data.EURBRL.ask;
+              }
+              else{
+                resultado = valor * (1/response.data.BTCEUR.ask);
+              }
+            }
+      
+            if(de == 'BRL'){
+              if(para == 'USD'){
+                resultado = valor * response.data.BRLUSD.ask;
+              }
+              else if(para == 'EUR'){
+                resultado = valor * response.data.BRLEUR.ask;
+              }
+              else{
+                resultado = valor * (1/response.data.BTCBRL.ask);
+              }
+            
+            }
+            if(de == 'BTC'){
+              if(para == 'USD'){
+                resultado = valor * response.data.BTCUSD.ask;
+              }
+              else if(para == 'EUR'){
+                resultado = valor *response.data.BTCEUR.ask;
+              }
+              else{
+                resultado = valor * 1000 * response.data.BTCBRL.ask;
+              }
+            }
+          }
+          
+          setResultado(simbolo+' '+resultado.toFixed(2));
+        }
+      }
+      else{
+        setResultado(valor);
+      }
+    }
+    catch(e){
+      console.error(e);
+    }
   }
 
-  pegarCotacao(){
-    
-  }
+  return (
+    <View style={styles.container}>
+      <Text style={styles.titulo}>Conversor de Moedas<br/>Dólar / Euro / Real / Bitcoin</Text>
 
-  converterMoedas(){
-    let de = this.state.de;
-    let para = this.state.para;
-    let valor = this.state.valor;
-    let simbolo = '';
-    let resultado = 0;
-    let cotacao = this.state.cotacao;
+      <Text style={styles.label}>Valor</Text>
+      <TextInput style={styles.input} placeholder='Digite um valor' value={valor} onChangeText={value => setValor(value)}></TextInput>
 
-    if(para == 0){
-      simbolo = '$';
-    }
-    else if(para == 1){
-      simbolo = '€';
-    }
-    else if(para == 2){
-      simbolo = 'R$'
-    }
-    else if(para == 3){
-      simbolo = '₿'
-    }
+      <Text style={styles.label}>De</Text>
+      <Picker style={styles.input} selectedValue={de} onValueChange={value => setDe(value)}>
+        <Picker.Item value={''} label='Escolha uma moeda'/>
+        <Picker.Item key={1} value={'USD'} label='Dólar Americano'/>
+        <Picker.Item key={2} value={'EUR'} label='Euro'/>
+        <Picker.Item key={3} value={'BRL'} label='Real'/>
+        <Picker.Item key={4} value={'BTC'} label='Bitcoin'/>
+      </Picker>
 
-    if(de == para){
-      resultado = valor;
-    }
-    else if(de == 0 && para == 1){
-      resultado = valor * cotacao;
-    }
-    else if(de == 0 && para == 2){
-      resultado = valor * cotacao;
-    }
-    else if(de == 0 && para == 3){
-      resultado = valor * cotacao;
-    }
-    else if(de == 1 && para == 0){
-      resultado = valor * cotacao;
-    }
-    else if(de == 1 && para == 2){
-      resultado = valor * cotacao;
-    }
-    else if(de == 1 && para == 3){
-      resultado = valor * cotacao;
-    }
-    else if(de == 2 && para == 0){
-      resultado = valor * cotacao;
-    }
-    else if(de == 2 && para == 1){
-      resultado = valor * cotacao;
-    }
-    else if(de == 2 && para == 3){
-      resultado = valor * cotacao;
-    }
-    else if(de == 3 && para == 0){
-      resultado = valor * cotacao;
-    }
-    else if(de == 3 && para == 1){
-      resultado = valor * cotacao;
-    }
-    else if(de == 3 && para == 2){
-      resultado = valor * cotacao;
-    }
+      <Text style={styles.label}>Para</Text>
+      <Picker style={styles.input} selectedValue={para} onValueChange={value => setPara(value)}>
+        <Picker.Item value={''} label='Escolha uma moeda'/>
+        <Picker.Item key={0} value={'USD'} label='Dólar Americano'/>
+        <Picker.Item key={1} value={'EUR'} label='Euro'/>
+        <Picker.Item key={2} value={'BRL'} label='Real'/>
+        <Picker.Item key={3} value={'BTC'} label='Bitcoin'/>
+      </Picker>
 
-    this.setState({
-      resultado: simbolo+' '+resultado
-    });
-  }
+      <Pressable onPress={pegarCotacao} style={styles.botao}>
+        <Text style={styles.textoBotao}>Converter</Text>
+      </Pressable>
 
-  render() {
-
-    let moedasItem = this.state.moedas.map( (valor, chave) => {
-      return <Picker.Item key={chave} value={chave} label={valor.nome}></Picker.Item>
-    });
-
-    return (
-      <View style={styles.container}>
-        <Text style={styles.titulo}>Conversor de Moedas<br/>Dólar / Euro / Real / Bitcoin</Text>
-
-        <Text style={styles.label}>Valor</Text>
-        <TextInput style={styles.input} placeholder='Digite um valor' onChangeText={this.pegarValor}></TextInput>
-
-        <Text style={styles.label}>De</Text>
-        <Picker style={styles.input} selectedValue={this.state.de} onValueChange={ (itemValue, itemIndex) => this.setState({de: itemValue}) }>
-          {moedasItem}
-        </Picker>
-
-        <Text style={styles.label}>Para</Text>
-        <Picker style={styles.input} selectedValue={this.state.para} onValueChange={ (itemValue, itemIndex) => this.setState({para: itemValue}) }>
-          {moedasItem}
-        </Picker>
-
-        <Pressable onPress={() => this.converterMoedas()} style={styles.botao}>
-          <Text style={styles.textoBotao}>Converter</Text>
-        </Pressable>
-
-        <Text style={[styles.label,styles.resultado]}>Resultado: {this.state.resultado}</Text>
-      </View>
-    );
-  }
+      <Text style={[styles.label,styles.resultado]}>Resultado: {resultado}</Text>
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
